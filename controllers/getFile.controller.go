@@ -4,6 +4,7 @@ import (
 	"c-vod/services"
 	"c-vod/utils/response"
 	"errors"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,8 +22,23 @@ func GetFile(c *fiber.Ctx) error {
 	file, err := services.FindFileRecord(object_id)
 
 	if err != nil {
-		response.Error(c, -2, err)
-		return nil
+
+		//check if upload exists
+		upload, err := services.FindUploadRecordById(object_id)
+
+		if err != nil {
+			response.Error(c, -2, err)
+			return nil
+		}
+
+		//check if upload is expired
+		if upload.ExpiresAt < time.Now().UnixMilli() {
+			response.Error(c, -2, err)
+			return nil
+		} else {
+			response.Custom(c, 1, nil, "waiting for user to upload the object")
+			return nil
+		}
 	}
 
 	data, err := services.GetFileResponseData(file)

@@ -42,6 +42,25 @@ func FindUploadRecord(upload_token string, upload_id string) (*uploadModel.Uploa
 	return upload, nil
 }
 
+func FindUploadRecordById(upload_id int) (*uploadModel.Upload, error) {
+	upload := &uploadModel.Upload{}
+
+	result := globals.App.DB.Where(
+		"id = ?",
+		upload_id,
+	).Find(upload)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, errors.New("upload record not found")
+	}
+
+	return upload, nil
+}
+
 func UploadExpirationCheck(upload *uploadModel.Upload) (bool, error) {
 
 	if upload.Status == uploadModel.Expired {
