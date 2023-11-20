@@ -54,7 +54,7 @@ func main() {
 	globals.App.Server = fiber.New(fiber.Config{
 		BodyLimit: 900 * 1024 * 1024,
 	})
-	globals.App.Router = globals.App.Server.Group("/vod/api/v1")
+	globals.App.Router = globals.App.Server.Group(config.App_api_prefix_v1)
 
 	globals.App.Router.Post("/file/create", controllers.CreateFile)
 
