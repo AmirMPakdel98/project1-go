@@ -9,6 +9,7 @@ type CreateFilesReq struct {
 type CreateFilesResData struct {
 	Object_id  uint32 `json:"object_id"`
 	Upload_url string `json:"upload_url"`
+	ExpiresAt  int64  `json:"expires_at"`
 }
 
 type GetFilesResData struct {
