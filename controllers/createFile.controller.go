@@ -56,6 +56,7 @@ func CreateFile(c *fiber.Ctx) error {
 		&types.CreateFilesResData{
 			Object_id:  upload.Id,
 			Upload_url: upload_url,
+			ExpiresAt:  upload.ExpiresAt,
 		},
 	)
 
