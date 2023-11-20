@@ -97,7 +97,7 @@ func (el *Elisma) convertToStreamableFormat(file *fileModel.File) error {
 
 	// + elisam will call edborn to update status to step3
 
-	err = Edborn.updateFileStatus(file, fileModel.READY_FOR_STORAGE)
+	err = Edborn.updateFileStatus(file, fileModel.READY_TO_STORE)
 
 	if err != nil {
 		//TODO: rollback

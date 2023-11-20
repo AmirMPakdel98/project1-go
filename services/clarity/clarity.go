@@ -103,7 +103,7 @@ func (cl *Clarity) handleByStatus(file *fileModel.File) {
 		cl.funpeg.standardization(file)
 	case fileModel.NORMALIZED:
 		cl.elisma.convertToStreamableFormat(file)
-	case fileModel.READY_FOR_STORAGE:
+	case fileModel.READY_TO_STORE:
 		cl.stigma.storeFileInStorage(file)
 	}
 }

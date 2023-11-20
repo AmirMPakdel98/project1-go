@@ -9,11 +9,11 @@ const (
 )
 
 const (
-	UPLOADED Status = iota
-	NORMALIZED
-	READY_FOR_STORAGE
-	COMPLETED
+	COMPLETED Status = iota
 	DELETED
+	UPLOADED
+	READY_TO_STORE
+	NORMALIZED
 )
 
 type File struct {

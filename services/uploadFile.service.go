@@ -89,7 +89,7 @@ func StoreFile(file *multipart.File, file_h *multipart.FileHeader, upload *uploa
 	//set file status base on file type
 	file_status := fileModel.UPLOADED
 	if upload.Type == fileModel.OTHER {
-		file_status = fileModel.READY_FOR_STORAGE
+		file_status = fileModel.READY_TO_STORE
 	}
 
 	//create the file record

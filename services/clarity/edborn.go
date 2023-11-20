@@ -22,7 +22,7 @@ func (ed *_Edborn) findWaitingFile() *fileModel.File {
 		"status IN (?,?,?)",
 		fileModel.UPLOADED,
 		fileModel.NORMALIZED,
-		fileModel.READY_FOR_STORAGE,
+		fileModel.READY_TO_STORE,
 	).First(dbfile)
 
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
