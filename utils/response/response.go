@@ -22,7 +22,7 @@ func Error(c *fiber.Ctx, code int, err error) {
 
 func Custom(c *fiber.Ctx, code int, err error, data any) {
 
-	if err != nil {
+	if err == nil {
 		c.JSON(fiber.Map{
 			"code":  code,
 			"error": nil,
