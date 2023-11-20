@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"c-vod/services"
+	"c-vod/utils/response"
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,20 +13,26 @@ func GetFile(c *fiber.Ctx) error {
 	object_id, err := c.ParamsInt("id", -1)
 
 	if object_id == -1 || err != nil {
-		return errors.New("object_id param is missing or invalid")
+		err = errors.New("object_id param is missing or invalid")
+		response.Error(c, -1, err)
+		return nil
 	}
 
-	response, err := services.GetFile(object_id)
+	file, err := services.FindFileRecord(object_id)
 
 	if err != nil {
-		return err
+		response.Error(c, -2, err)
+		return nil
 	}
 
-	c.JSON(fiber.Map{
-		"code":  0,
-		"error": nil,
-		"data":  &response,
-	})
+	data, err := services.GetFileResponseData(file)
+
+	if err != nil {
+		response.ServerError(c, err)
+		return nil
+	}
+
+	response.Success(c, &data)
 
 	return nil
 }

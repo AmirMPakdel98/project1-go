@@ -43,7 +43,21 @@ func (ed *_Edborn) updateFileStatus(file *fileModel.File, status fileModel.Statu
 	uq_result := globals.App.DB.Model(&fileModel.File{}).Where("id = ?", file.Id).Update("status", status)
 
 	if uq_result.Error != nil {
-		fmt.Println("error on updating file in db:", uq_result.Error.Error())
+		fmt.Println("error on updating file's status in db:", uq_result.Error.Error())
+		return uq_result.Error
+	}
+
+	return nil
+}
+
+func (ed *_Edborn) updateFileDuration(file *fileModel.File, duration int) error {
+
+	uq_result := globals.App.DB.Model(&fileModel.File{}).
+		Where("id = ?", file.Id).
+		Update("duration", duration)
+
+	if uq_result.Error != nil {
+		fmt.Println("error on updating file's duration in db:", uq_result.Error.Error())
 		return uq_result.Error
 	}
 

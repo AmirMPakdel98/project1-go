@@ -64,30 +64,9 @@ func UploadExpirationCheck(upload *uploadModel.Upload) (bool, error) {
 	return false, nil
 }
 
-func StoreFile(file_h *multipart.FileHeader, upload *uploadModel.Upload) error {
+func StoreFile(file *multipart.File, file_h *multipart.FileHeader, upload *uploadModel.Upload) error {
 
-	// check if fileHeader can open without error
-	file, err := file_h.Open()
-	if err != nil {
-		return err
-	}
-
-	// compare file size
-	if upload.Size != file_h.Size {
-		return errors.New("file size does not match")
-	}
-
-	//compate file ext
-	file_ext, err := helper.GetFileExtension(file_h)
-	if err != nil {
-		return err
-	}
-	if upload.Ext != file_ext {
-		return errors.New("file size extension not match")
-	}
-
-	//TODO: check if file is truly the same type
-
+	var err error
 	//set file status base on file type
 	file_status := fileModel.UPLOADED
 	if upload.Type == fileModel.OTHER {
@@ -135,7 +114,7 @@ func StoreFile(file_h *multipart.FileHeader, upload *uploadModel.Upload) error {
 		//TODO: rollback -> delete file record from db
 		return err
 	}
-	if _, err = io.Copy(destination_file, file); err != nil {
+	if _, err = io.Copy(destination_file, *file); err != nil {
 		//TODO: rollback -> delete file record from db
 		return err
 	}

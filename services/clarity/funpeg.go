@@ -1,9 +1,11 @@
 package clarity
 
 import (
+	"bytes"
 	fileModel "c-vod/models/fileModel"
 	"c-vod/utils/globals"
 	"c-vod/utils/helper"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +13,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
+	"strings"
 )
 
 /*
@@ -20,10 +24,30 @@ type Funpeg struct{}
 
 func (fu *Funpeg) standardization(file *fileModel.File) error {
 
+	// + funpeg will get the video duration
+	duration, err := fu.getVideoDuration(file)
+	if err != nil {
+		// TODO: rollback
+		return err
+	}
+
+	// + funpeg will call edborn to update dbfile duration
+	err = Edborn.updateFileDuration(file, duration)
+	if err != nil {
+		// TODO: rollback
+		return err
+	}
+
+	// + funpeg will call edborn to update dbfile status to step2
+	err = Edborn.updateFileStatus(file, fileModel.NORMALIZED)
+	if err != nil {
+		// TODO: rollback
+		return err
+	}
+
 	// + funpeg will convert video into 480p and 720p res files
 	// in stage2 folder
-	//err := fu.mockStandardization(file)
-	err := fu._standardization(file)
+	err = fu._standardization(file)
 
 	if err != nil {
 		// TODO: rollback
@@ -47,6 +71,72 @@ func (fu *Funpeg) standardization(file *fileModel.File) error {
 	}
 
 	return nil
+}
+
+func (fu *Funpeg) getVideoDuration(file *fileModel.File) (int, error) {
+
+	var ffmpeg string
+
+	switch runtime.GOOS {
+	case "darwin":
+		ffmpeg = "./ffmpeg-osx"
+	case "win32":
+		ffmpeg = "./ffmpeg.exe"
+	case "linux":
+		ffmpeg = "./ffmpeg-linux"
+	}
+
+	duration := 0
+
+	file_id := fmt.Sprintf("%d", file.Id)
+
+	video_input := "./../storage/stage1/" + file_id + "." + file.Ext
+
+	cmd := exec.Command(ffmpeg,
+		"-i",
+		video_input,
+	)
+
+	cmd.Dir = filepath.Join(helper.GetCurrentDir(), "ffmpeg")
+
+	buf := new(bytes.Buffer)
+
+	cmd.Stderr = buf
+
+	cmd.Run()
+
+	video_info := buf.String()
+
+	index := strings.Index(video_info, "Duration:")
+
+	if index == -1 {
+		return 0, errors.New("duration not found in video info")
+	}
+
+	start_index := index + len("Duration: ")
+	end_index := start_index + 8
+
+	duration_str := video_info[start_index:end_index]
+
+	str_slice := strings.Split(duration_str, ":")
+
+	hour, err := strconv.Atoi(str_slice[0])
+	if err != nil {
+		return 0, err
+	}
+	min, err := strconv.Atoi(str_slice[1])
+	if err != nil {
+		return 0, err
+	}
+	sec, err := strconv.Atoi(str_slice[2])
+	if err != nil {
+		return 0, err
+	}
+	duration += hour * 3600
+	duration += min * 60
+	duration += sec
+
+	return duration, nil
 }
 
 func (fu *Funpeg) _standardization(file *fileModel.File) error {
@@ -78,7 +168,7 @@ func (fu *Funpeg) _standardization(file *fileModel.File) error {
 		"-c:v",
 		"libx264",
 		"-crf",
-		"23",
+		"28",
 		"-preset",
 		"medium",
 		"-c:a",

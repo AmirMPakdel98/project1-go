@@ -4,7 +4,6 @@ import (
 	"c-vod/utils/helper"
 	"c-vod/utils/types"
 	"errors"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -21,8 +20,6 @@ func LoadConfig() (*types.AppConfig, error) {
 	}
 
 	env_path := ext_path + "/" + env_file_name
-
-	log.Println("App running dir : " + ext_path)
 
 	err := godotenv.Load(env_path)
 

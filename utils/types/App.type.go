@@ -1,6 +1,7 @@
 package types
 
 import (
+	"c-vod/utils/helper"
 	"c-vod/utils/storage"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,4 +14,5 @@ type App struct {
 	Router  fiber.Router
 	DB      *gorm.DB
 	Storage *storage.Storage
+	Log     *helper.Log
 }

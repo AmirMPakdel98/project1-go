@@ -2,7 +2,7 @@ package clarity
 
 import (
 	fileModel "c-vod/models/fileModel"
-	"log"
+	"c-vod/utils/globals"
 	"time"
 )
 
@@ -33,18 +33,17 @@ func (cl *Clarity) Start() {
 
 	for {
 		cl.checkForNewFile()
-		time.Sleep(5 * time.Second)
 	}
 }
 
 func (cl *Clarity) checkForNewFile() {
 
-	log.Print("checking for new file")
+	globals.App.Log.Println("checking for new file")
 
 	file := Edborn.findWaitingFile()
 
 	if file == nil {
-		log.Printf("no file. sleeping for %v", cl.sleepDuration)
+		globals.App.Log.Printf("no file. sleeping for %v", cl.sleepDuration)
 		time.Sleep(cl.sleepDuration)
 		return
 	}
@@ -70,11 +69,7 @@ func (cl *Clarity) checkForNewFile() {
 		+ dbfile type is Video and clarity will call funpeg
 		for video standadization
 	*/
-	if file.Status == fileModel.UPLOADED {
-		err = cl.funpeg.standardization(file)
-		if err != nil {
-			return
-		}
+	if file.Status == fileModel.NORMALIZED {
 		//	+ clarity will call elisma to handle this video file
 		err = cl.elisma.convertToStreamableFormat(file)
 		if err != nil {
@@ -82,7 +77,11 @@ func (cl *Clarity) checkForNewFile() {
 		}
 	}
 
-	if file.Status == fileModel.NORMALIZED {
+	if file.Status == fileModel.UPLOADED {
+		err = cl.funpeg.standardization(file)
+		if err != nil {
+			return
+		}
 		//	+ clarity will call elisma to handle this video file
 		err = cl.elisma.convertToStreamableFormat(file)
 		if err != nil {

@@ -7,20 +7,7 @@ import (
 	"fmt"
 )
 
-func DeleteFile(object_id int) error {
-
-	file := &fileModel.File{}
-
-	result := globals.App.DB.Where("id = ?", object_id).First(file)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		//TODO: rollback
-		return errors.New("file not found")
-	}
+func DeleteFile(file *fileModel.File) error {
 
 	file_id := fmt.Sprintf("%d", file.Id)
 
@@ -41,7 +28,7 @@ func DeleteFile(object_id int) error {
 
 	if del_result.Error != nil {
 		//TODO: rollback
-		return result.Error
+		return del_result.Error
 	}
 
 	if del_result.RowsAffected == 0 {

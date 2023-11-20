@@ -12,7 +12,8 @@ type CreateFilesResData struct {
 }
 
 type GetFilesResData struct {
-	File_status int       `json:"file_status"`
-	File_url    string    `json:"file_url"`
-	File_keys   []FileKey `json:"file_keys"`
+	File_status   int       `json:"file_status"`
+	File_duration int       `json:"file_duration"`
+	File_url      string    `json:"file_url"`
+	File_keys     []FileKey `json:"file_keys"`
 }
