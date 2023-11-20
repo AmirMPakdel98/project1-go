@@ -29,9 +29,8 @@ func FindFileRecord(file_id int) (*fileModel.File, error) {
 func GetFileResponseData(file *fileModel.File) (*types.GetFilesResData, error) {
 
 	file_id := fmt.Sprintf("%d", file.Id)
-
 	file_name := ""
-
+	url := ""
 	var keys []types.FileKey
 
 	if (file.Type == fileModel.VIDEO) && (file.Status == fileModel.COMPLETED) {
@@ -49,12 +48,14 @@ func GetFileResponseData(file *fileModel.File) (*types.GetFilesResData, error) {
 		file_name = fmt.Sprintf("%s.%s", file_id, file.Ext)
 	}
 
-	url := fmt.Sprintf(
-		"https://vod-storage-test.s3.ir-thr-at1.arvanstorage.ir"+
-			"/edu-arch/%s/%s",
-		file_id,
-		file_name,
-	)
+	if file.Status == fileModel.COMPLETED {
+		url = fmt.Sprintf(
+			"https://vod-storage-test.s3.ir-thr-at1.arvanstorage.ir"+
+				"/edu-arch/%s/%s",
+			file_id,
+			file_name,
+		)
+	}
 
 	return &types.GetFilesResData{
 		File_status:   int(file.Status),
