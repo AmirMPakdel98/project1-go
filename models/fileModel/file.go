@@ -12,8 +12,8 @@ const (
 	COMPLETED Status = iota
 	DELETED
 	UPLOADED
-	READY_TO_STORE
 	NORMALIZED
+	READY_TO_STORE
 )
 
 type File struct {
