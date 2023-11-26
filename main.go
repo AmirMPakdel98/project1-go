@@ -11,6 +11,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
@@ -54,6 +55,15 @@ func main() {
 	globals.App.Server = fiber.New(fiber.Config{
 		BodyLimit: 900 * 1024 * 1024,
 	})
+
+	// setting cors config
+	globals.App.Server.Use(cors.New(cors.Config{
+		AllowHeaders:     "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,Connection,Access-Control-Allow-Origin",
+		AllowOrigins:     "*",
+		AllowCredentials: true,
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
+	}))
+
 	globals.App.Router = globals.App.Server.Group(config.App_api_prefix_v1)
 
 	globals.App.Router.Post("/file/create", controllers.CreateFile)

@@ -33,7 +33,7 @@ func GetFile(c *fiber.Ctx) error {
 
 		//check if upload is expired
 		if upload.ExpiresAt < time.Now().UnixMilli() {
-			response.Error(c, -2, err)
+			response.Error(c, -2, errors.New("upload url is expired"))
 			return nil
 		} else {
 			response.Custom(c, 1, nil, "waiting for user to upload the object")
