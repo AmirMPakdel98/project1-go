@@ -1,8 +1,10 @@
 package clarity
 
 import (
+	"c-vod/models/enckeyModel"
 	fileModel "c-vod/models/fileModel"
 	"c-vod/utils/globals"
+	"c-vod/utils/types"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -59,6 +61,22 @@ func (ed *_Edborn) updateFileDuration(file *fileModel.File, duration int) error 
 	if uq_result.Error != nil {
 		fmt.Println("error on updating file's duration in db:", uq_result.Error.Error())
 		return uq_result.Error
+	}
+
+	return nil
+}
+
+func (ed *_Edborn) insertVideoKeys(keys *types.VideoKeys, file_id uint32) error {
+
+	newKeys := &enckeyModel.Enckey{
+		File_id: file_id,
+		Payload: keys.String(),
+	}
+
+	result := globals.App.DB.Create(newKeys)
+
+	if result.Error != nil {
+		return result.Error
 	}
 
 	return nil

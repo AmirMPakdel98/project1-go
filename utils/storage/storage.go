@@ -15,10 +15,10 @@ type Storage struct {
 
 func InitMinio() (*Storage, error) {
 
-	//TODO: put in .env and read from there
 	endpoint := os.Getenv("STORAGE_ENDPOINT")
 	accessKeyID := os.Getenv("STORAGE_ACCESS_KEY")
 	secretAccessKey := os.Getenv("STORAGE_SECRET_KEY")
+	bucketName := os.Getenv("STORAGE_BUCKET_NAME")
 	useSSL := true
 
 	minioClient, err := minio.New(endpoint, &minio.Options{
@@ -31,7 +31,7 @@ func InitMinio() (*Storage, error) {
 	}
 
 	storage := &Storage{
-		BucketName: "vod-storage-test",
+		BucketName: bucketName,
 		Client:     minioClient,
 	}
 

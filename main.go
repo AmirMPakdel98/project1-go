@@ -6,9 +6,10 @@ import (
 	"c-vod/utils/db"
 	"c-vod/utils/globals"
 	"c-vod/utils/helper"
+	"c-vod/utils/log"
 	"c-vod/utils/storage"
 	"c-vod/utils/types"
-	"log"
+	_log "log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -21,15 +22,15 @@ func main() {
 	// setting the App.Config with .env file
 	config, err := LoadConfig()
 	if err != nil {
-		log.Fatalf("could not load config : %v", err)
+		_log.Fatalf("could not load config : %v", err)
 	}
 	globals.App.Config = config
 
 	// setting the App.Log
-	mlog := &helper.Log{
+	log := &log.Log{
 		Log_enabled: config.Log_enabled == "true",
 	}
-	globals.App.Log = mlog
+	globals.App.Log = log
 
 	// checking and creating app's necessary dirs
 	err = helper.CheckAndCreateAppDirs()
@@ -58,7 +59,7 @@ func main() {
 
 	// setting cors config
 	globals.App.Server.Use(cors.New(cors.Config{
-		AllowHeaders:     "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,Connection,Access-Control-Allow-Origin",
+		AllowHeaders:     "*",
 		AllowOrigins:     "*",
 		AllowCredentials: true,
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",

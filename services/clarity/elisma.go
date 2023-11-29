@@ -30,14 +30,34 @@ func (el *Elisma) convertToStreamableFormat(file *fileModel.File) error {
 		packager = "./packager-linux-x64"
 	}
 
-	keys := []struct {
-		id    string
-		value string
-	}{
-		{id: "f3c5e0361e6654b28f8049c778b23946", value: "a4631a153a443df9eed0593043db7519"},
-		{id: "abba271e8bcf552bbd2e86a434a9a5d9", value: "69eaa802a6763af979e8d1940fb88392"},
-		{id: "6d76f25cb17f5e16b8eaef6bbf582d8e", value: "cb541084c99731aef4fff74500c12ead"},
+	_keys, err := helper.GenerateVideoKeys()
+	keys := *_keys
+
+	if err != nil {
+		//TODO: rollback
+		fmt.Println("error in calling GenerateVideoKeys() :", err.Error())
+		return err
 	}
+
+	// + elisma will call edborn to insert vide keys record in db
+	err = Edborn.insertVideoKeys(_keys, file.Id)
+
+	if err != nil {
+		//TODO: rollback
+		fmt.Println("error on inserting videoKeys record:", err.Error())
+		return err
+	}
+
+	/*
+		keys = []struct {
+			id    string
+			value string
+		}{
+			{id: "f3c5e0361e6654b28f8049c778b23946", value: "a4631a153a443df9eed0593043db7519"},
+			{id: "abba271e8bcf552bbd2e86a434a9a5d9", value: "69eaa802a6763af979e8d1940fb88392"},
+			{id: "6d76f25cb17f5e16b8eaef6bbf582d8e", value: "cb541084c99731aef4fff74500c12ead"},
+		}
+	*/
 
 	file_id := fmt.Sprintf("%d", file.Id)
 
@@ -57,9 +77,9 @@ func (el *Elisma) convertToStreamableFormat(file *fileModel.File) error {
 		fmt.Sprintf("in=%s,stream=video,init_segment=%s,segment_template=%s,drm_label=SD", video480_input, video480_init, video480_segtem),
 		fmt.Sprintf("in=%s,stream=video,init_segment=%s,segment_template=%s,drm_label=HD", video720_input, video720_init, video720_segtem),
 		"--keys",
-		fmt.Sprintf("label=AUDIO:key_id=%s:key=%s,", keys[0].id, keys[0].value)+
-			fmt.Sprintf("label=SD:key_id=%s:key=%s,", keys[1].id, keys[1].value)+
-			fmt.Sprintf("label=HD:key_id=%s:key=%s", keys[2].id, keys[2].value),
+		fmt.Sprintf("label=AUDIO:key_id=%s:key=%s,", keys[0].Id, keys[0].Value)+
+			fmt.Sprintf("label=SD:key_id=%s:key=%s,", keys[1].Id, keys[1].Value)+
+			fmt.Sprintf("label=HD:key_id=%s:key=%s", keys[2].Id, keys[2].Value),
 		"--enable_raw_key_encryption",
 		"--segment_duration",
 		segment_duration,
@@ -77,7 +97,7 @@ func (el *Elisma) convertToStreamableFormat(file *fileModel.File) error {
 	}
 
 	// + elisma will store output in a new folder with dbfile id in stage3 folder
-	err := cmd.Run()
+	err = cmd.Run()
 
 	if err != nil {
 		//TODO: rollback
